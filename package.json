@@ -14,6 +14,7 @@
   "dependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.4",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.8",
+    "@nomicfoundation/hardhat-toolbox": "^2.0.0",
     "@ethereumjs/rlp": "^5.0.1",
     "@ethereumjs/trie": "^6.0.1",
     "@ethereumjs/util": "^9.0.1",
