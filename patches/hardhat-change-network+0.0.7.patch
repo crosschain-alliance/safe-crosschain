@@ -1,0 +1,44 @@
+diff --git a/node_modules/hardhat-change-network/dist/src/index.js b/node_modules/hardhat-change-network/dist/src/index.js
+index 495956e..00b1ef2 100644
+--- a/node_modules/hardhat-change-network/dist/src/index.js
++++ b/node_modules/hardhat-change-network/dist/src/index.js
+@@ -10,13 +10,13 @@ config_1.extendEnvironment((hre) => {
+     // We use lazyObject to avoid initializing things until they are actually
+     // needed.
+     const providers = {};
+-    hre.getProvider = function getProvider(name) {
++    hre.getProvider = async function getProvider(name) {
+         if (!providers[name]) {
+-            providers[name] = construction_1.createProvider(name, this.config.networks[name], this.config.paths, this.artifacts);
++            providers[name] = await construction_1.createProvider(this.config, name, this.artifacts);
+         }
+         return providers[name];
+     };
+-    hre.changeNetwork = function changeNetwork(newNetwork) {
++    hre.changeNetwork = async function changeNetwork(newNetwork) {
+         if (!this.config.networks[newNetwork]) {
+             throw new Error(`changeNetwork: Couldn't find network '${newNetwork}'`);
+         }
+@@ -25,7 +25,7 @@ config_1.extendEnvironment((hre) => {
+         }
+         this.network.name = newNetwork;
+         this.network.config = this.config.networks[newNetwork];
+-        this.network.provider = this.getProvider(newNetwork);
++        this.network.provider = await this.getProvider(newNetwork);
+         if (this.ethers) {
+             const { EthersProviderWrapper } = require("@nomiclabs/hardhat-ethers/internal/ethers-provider-wrapper");
+             this.ethers.provider = new EthersProviderWrapper(this.network.provider);
+@@ -33,3 +33,12 @@ config_1.extendEnvironment((hre) => {
+     };
+ });
+ //# sourceMappingURL=index.js.map
++
++/**
++ * 
++ * config: HardhatConfig,
++  networkName: string,
++  artifacts?: Artifacts,
++  experimentalHardhatNetworkMessageTraceHooks: BoundExperimentalHardhatNetworkMessageTraceHook[] = [],
++  extenders: ProviderExtender[] = []
++ */
+\ No newline at end of file
