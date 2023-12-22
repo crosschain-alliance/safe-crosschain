@@ -12,6 +12,10 @@ contract Peripheral {
         _generateCommitment(abi.encode(threshold));
     }
 
+    function enableModule(address module) external {
+        _generateCommitment(abi.encode(module));
+    }
+
     function execTransaction(
         address to,
         uint256 value,

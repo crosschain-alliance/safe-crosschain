@@ -64,6 +64,26 @@ contract ControllerModule {
         GIRI_GIRI_BASHI = giriGiriBashi;
     }
 
+    function changeThreshold(uint256 threshold, Proof calldata proof) external {
+        _verifyProof(proof, abi.encode(threshold));
+        ISafe(MAIN_SAFE).execTransactionFromModule(
+            MAIN_SAFE,
+            0,
+            abi.encodeWithSelector(ISafe.changeThreshold.selector, threshold),
+            Enum.Operation.Call
+        );
+    }
+
+    function enableModule(address module, Proof calldata proof) external {
+        _verifyProof(proof, abi.encode(module));
+        ISafe(MAIN_SAFE).execTransactionFromModule(
+            MAIN_SAFE,
+            0,
+            abi.encodeWithSelector(ISafe.changeThreshold.selector, module),
+            Enum.Operation.Call
+        );
+    }
+
     function execTransaction(SafeTxParams calldata safeTxParams, Proof calldata proof) external {
         _verifyProof(
             proof,
@@ -100,16 +120,6 @@ contract ControllerModule {
         );
     }
 
-    function changeThreshold(uint256 threshold, Proof calldata proof) external {
-        _verifyProof(proof, abi.encode(threshold));
-        ISafe(MAIN_SAFE).execTransactionFromModule(
-            SOURCE_SAFE,
-            0,
-            abi.encodeWithSelector(ISafe.changeThreshold.selector, threshold),
-            Enum.Operation.Call
-        );
-    }
-
     function _verifyProof(Proof calldata proof, bytes memory data) internal {
         bytes32 expectedBlockHeaderHash = IGiriGiriBashi(GIRI_GIRI_BASHI).getThresholdHash(
             SOURCE_CHAIN_ID,
@@ -129,7 +139,6 @@ contract ControllerModule {
         }
 
         _checkNonceAndIncrementExpectedNonce(proof.nonce);
-        // TODO: verify that the same call is executed only once
         return;
     }
 
