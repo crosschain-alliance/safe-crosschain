@@ -9,10 +9,7 @@ contract Peripheral {
     event Operation(uint256 nonce, address safe, bytes data);
 
     function changeThreshold(uint256 threshold) external {
-        uint256 currentNonce = nonce;
-        bytes memory encodedThreshold = abi.encode(threshold);
-        latestCommitments[msg.sender] = _getCommitment(encodedThreshold);
-        emit Operation(currentNonce, msg.sender, encodedThreshold);
+        _generateCommitment(abi.encode(threshold));
     }
 
     function execTransaction(
@@ -27,28 +24,18 @@ contract Peripheral {
         address payable refundReceiver,
         bytes calldata signatures
     ) external {
-        uint256 currentNonce = nonce;
-        bytes memory encodedParams = abi.encode(
-            to,
-            value,
-            data,
-            operation,
-            safeTxGas,
-            baseGas,
-            gasPrice,
-            gasToken,
-            refundReceiver,
-            signatures
+        _generateCommitment(
+            abi.encode(to, value, data, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, signatures)
         );
-        latestCommitments[msg.sender] = _getCommitment(encodedParams);
-        emit Operation(currentNonce, msg.sender, encodedParams);
     }
 
-    function _getCommitment(bytes memory data) internal returns (bytes32) {
-        bytes32 commitment = keccak256(abi.encode(data, nonce));
+    function _generateCommitment(bytes memory data) internal {
+        uint256 currentNonce = nonce;
+        bytes32 commitment = keccak256(abi.encode(data, currentNonce));
+        latestCommitments[msg.sender] = commitment;
         unchecked {
             ++nonce;
         }
-        return commitment;
+        emit Operation(currentNonce, msg.sender, data);
     }
 }
