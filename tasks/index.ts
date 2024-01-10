@@ -18,8 +18,8 @@ task("Peripheral:deploy", "deploy Peripheral")
 
 task("ControllerModule:deploy", "deploy ControllerModule")
   .addParam("sourceChainId", "source chain id", undefined, types.int)
-  .addParam("sourceSafe", "Safe address in the source chain", undefined, types.string)
-  .addParam("mainSafe", "main Safe address in the destination chain", undefined, types.string)
+  .addParam("mainSafe", "main Safe address", undefined, types.string)
+  .addParam("secondarySafe", "Secondary Safe address in the source chain", undefined, types.string)
   .addParam("peripheral", "address of peripheral on the source chain", undefined, types.string)
   .addParam("giriGiriBashi", "address of GiriGiriBashi", undefined, types.string)
   .addFlag("verify", "whether to verify the contract on Etherscan")
@@ -27,8 +27,8 @@ task("ControllerModule:deploy", "deploy ControllerModule")
     const ControllerModule = await hre.ethers.getContractFactory("ControllerModule")
     const constructorArguments = [
       _taskArgs.sourceChainId,
-      _taskArgs.sourceSafe,
       _taskArgs.mainSafe,
+      _taskArgs.secondarySafe,
       _taskArgs.peripheral,
       _taskArgs.giriGiriBashi,
     ] as const
@@ -54,7 +54,7 @@ task("ControllerModule:execTransaction:sendNativeToken", "Sends 1 wei")
     const ControllerModule = await hre.ethers.getContractFactory("ControllerModule")
     const controllerModule = await ControllerModule.attach(controllerModuleAddress)
     const peripheralAddress = await controllerModule.PERIPHERAL()
-    const sourceSafeAddress = await controllerModule.SOURCE_SAFE()
+    const mainSafeAddress = await controllerModule.MAIN_SAFE()
 
     let accounts = await hre.ethers.getSigners()
     let safeOwner = accounts[0]
@@ -89,17 +89,17 @@ task("ControllerModule:execTransaction:sendNativeToken", "Sends 1 wei")
 
     accounts = await hre.ethers.getSigners()
     safeOwner = accounts[0]
-    const ethAdapterSource = new EthersAdapter({
+    const ethAdapterMain = new EthersAdapter({
       ethers: hre.ethers,
       signerOrProvider: safeOwner,
     })
-    const safeSdkSource = await Safe.create({ ethAdapter: ethAdapterSource, safeAddress: sourceSafeAddress }) // safe on source
+    const safeSdkMain = await Safe.create({ ethAdapter: ethAdapterMain, safeAddress: mainSafeAddress }) // safe on source
 
     const Peripheral = await hre.ethers.getContractFactory("Peripheral")
     const peripheral = await Peripheral.attach(peripheralAddress)
     const peripheralNonce = await peripheral.nonce()
 
-    const sourceTransaction = await safeSdkSource.createTransaction({
+    const mainTransaction = await safeSdkMain.createTransaction({
       safeTransactionData: {
         to: peripheralAddress,
         value: "0",
@@ -125,7 +125,7 @@ task("ControllerModule:execTransaction:sendNativeToken", "Sends 1 wei")
         refundReceiver: safeOwner.address,
       },
     })
-    const executeTxResponse = await safeSdkSource.executeTransaction(sourceTransaction)
+    const executeTxResponse = await safeSdkMain.executeTransaction(mainTransaction)
     console.log("Source chain tx:", executeTxResponse.hash)
     const receipt = executeTxResponse.transactionResponse && (await executeTxResponse.transactionResponse.wait())
 
@@ -133,7 +133,7 @@ task("ControllerModule:execTransaction:sendNativeToken", "Sends 1 wei")
       blockNumber: receipt?.blockNumber,
       hre,
       peripheralAddress,
-      sourceSafeAddress,
+      mainSafeAddress,
     })
 
     // Switch back to destination network to call controller module

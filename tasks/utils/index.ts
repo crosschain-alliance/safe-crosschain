@@ -39,13 +39,13 @@ const getRlpEncodedBlockHeaderByBlockNumber = async (_blockNumber: number, _hre:
   return rlpEncodeBlock(block)
 }
 
-export const getProof = async ({ blockNumber, hre, peripheralAddress, sourceSafeAddress }: any) => {
+export const getProof = async ({ blockNumber, hre, peripheralAddress, mainSafeAddress }: any) => {
   const block = await getBlock(blockNumber, hre)
   // TODO: ensure that encoding fx works
   const blockHeaderRlp = await getRlpEncodedBlockHeaderByBlockNumber(blockNumber, hre)
 
   const storageKey = hre.ethers.utils.keccak256(
-    hre.ethers.utils.defaultAbiCoder.encode(["address", "uint256"], [sourceSafeAddress, 0]),
+    hre.ethers.utils.defaultAbiCoder.encode(["address", "uint256"], [mainSafeAddress, 0]),
   )
   const {
     accountProof,

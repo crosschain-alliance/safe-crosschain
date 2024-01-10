@@ -13,8 +13,8 @@ contract ControllerModule {
     uint256 internal constant LATEST_COMMITMENTS_SLOT = 0;
 
     uint256 public immutable SOURCE_CHAIN_ID;
-    address public immutable SOURCE_SAFE;
     address public immutable MAIN_SAFE;
+    address public immutable SECONDARY_SAFE;
     address public immutable PERIPHERAL;
     address public immutable GIRI_GIRI_BASHI;
 
@@ -52,22 +52,22 @@ contract ControllerModule {
 
     constructor(
         uint256 sourceChainId,
-        address sourceSafe,
         address mainSafe,
+        address secondarySafe,
         address peripheral,
         address giriGiriBashi
     ) {
         SOURCE_CHAIN_ID = sourceChainId;
-        SOURCE_SAFE = sourceSafe;
         MAIN_SAFE = mainSafe;
+        SECONDARY_SAFE = secondarySafe;
         PERIPHERAL = peripheral;
         GIRI_GIRI_BASHI = giriGiriBashi;
     }
 
     function changeThreshold(uint256 threshold, Proof calldata proof) external {
         _verifyProof(proof, abi.encode(threshold));
-        ISafe(MAIN_SAFE).execTransactionFromModule(
-            MAIN_SAFE,
+        ISafe(SECONDARY_SAFE).execTransactionFromModule(
+            SECONDARY_SAFE,
             0,
             abi.encodeWithSelector(ISafe.changeThreshold.selector, threshold),
             Enum.Operation.Call
@@ -76,8 +76,8 @@ contract ControllerModule {
 
     function enableModule(address module, Proof calldata proof) external {
         _verifyProof(proof, abi.encode(module));
-        ISafe(MAIN_SAFE).execTransactionFromModule(
-            MAIN_SAFE,
+        ISafe(SECONDARY_SAFE).execTransactionFromModule(
+            SECONDARY_SAFE,
             0,
             abi.encodeWithSelector(ISafe.changeThreshold.selector, module),
             Enum.Operation.Call
@@ -100,8 +100,8 @@ contract ControllerModule {
                 safeTxParams.signatures
             )
         );
-        ISafe(MAIN_SAFE).execTransactionFromModule(
-            MAIN_SAFE,
+        ISafe(SECONDARY_SAFE).execTransactionFromModule(
+            SECONDARY_SAFE,
             0,
             abi.encodeWithSelector(
                 ISafe.execTransaction.selector,
@@ -166,7 +166,7 @@ contract ControllerModule {
     ) internal view returns (bytes32) {
         bytes memory slotValue = MerklePatriciaProofVerifier.extractProofValue(
             storageRoot,
-            abi.encodePacked(keccak256(abi.encode(keccak256(abi.encode(SOURCE_SAFE, LATEST_COMMITMENTS_SLOT))))),
+            abi.encodePacked(keccak256(abi.encode(keccak256(abi.encode(MAIN_SAFE, LATEST_COMMITMENTS_SLOT))))),
             peripheralStorageProof.toRlpItem().toList()
         );
         return _bytesToBytes32(slotValue);
