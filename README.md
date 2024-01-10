@@ -18,7 +18,7 @@ Safe Crosschain is a mechanism crafted to empower users with the ability to cont
 
 ## How it works
 
-1. Begin by deploying two Safes - the main Safe and the `Peripheral` Safe. Attach a module called `ControllerModule` to the main Safe.
+1. Begin by deploying two Safes - the main Safe and the Secondary Safe. Attach a module called `ControllerModule` to the main Safe.
 
 2. Users wishing to execute a cross-chain transaction should call `execTransaction` on the `Peripheral` Safe which just writes in storage a commitment corresponding to the used function parameters.
 
