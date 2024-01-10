@@ -42,7 +42,7 @@ task("ControllerModule:execTransaction:sendNativeToken", "Sends 1 wei")
   .addParam("destinationNetwork", "Destination network", undefined, types.string)
   .setAction(async (_taskArgs, hre) => {
     const { destinationNetwork, controllerModule: controllerModuleAddress } = _taskArgs
-    const sourceNetwork = await hre.network.name
+    const mainNetwork = await hre.network.name
 
     const safeTxGas = "0"
     const baseGas = "0"
@@ -85,7 +85,7 @@ task("ControllerModule:execTransaction:sendNativeToken", "Sends 1 wei")
     const signature = await safeSdkDestination.signTransactionHash(safeTxHash)
 
     // Switch to source network to call peripheral
-    await hre.changeNetwork(sourceNetwork)
+    await hre.changeNetwork(mainNetwork)
 
     accounts = await hre.ethers.getSigners()
     safeOwner = accounts[0]
