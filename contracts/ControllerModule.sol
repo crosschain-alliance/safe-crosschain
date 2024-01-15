@@ -135,7 +135,7 @@ contract ControllerModule {
             _verifyAccountProofAndGetStorageRoot(proof.blockHeader, proof.peripheralAccountProof),
             proof.peripheralStorageProof
         );
-        bytes32 latestPeripheralCommitment = keccak256(abi.encode(data, proof.nonce));
+        bytes32 latestPeripheralCommitment = keccak256(abi.encode(block.chainid, data, proof.nonce));
         if (expectedLatestPeripheralCommitment != latestPeripheralCommitment) {
             revert InvalidLatestPeripheralCommitment(latestPeripheralCommitment, expectedLatestPeripheralCommitment);
         }

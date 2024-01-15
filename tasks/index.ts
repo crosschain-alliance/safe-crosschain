@@ -8,12 +8,14 @@ import { getProof } from "./utils"
 import { ProofStructOutput, SafeTxParamsStruct } from "../types/Controller"
 
 task("Peripheral:deploy", "deploy Peripheral")
+  .addParam("targetChainId", "target chain id", undefined, types.int)
   .addFlag("verify", "whether to verify the contract on Etherscan")
   .setAction(async (_taskArgs, hre) => {
     const Peripheral = await hre.ethers.getContractFactory("Peripheral")
-    const peripheral = await Peripheral.deploy()
+    const constructorArguments = [_taskArgs.targetChainId]
+    const peripheral = await Peripheral.deploy(...constructorArguments)
     console.log("Peripheral deployed at: ", peripheral.address)
-    if (_taskArgs.verify) await verify(hre, peripheral, [])
+    if (_taskArgs.verify) await verify(hre, peripheral, constructorArguments)
   })
 
 task("ControllerModule:deploy", "deploy ControllerModule")
