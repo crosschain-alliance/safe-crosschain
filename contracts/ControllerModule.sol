@@ -81,7 +81,7 @@ contract ControllerModule {
         ISafe(SECONDARY_SAFE).execTransactionFromModule(
             SECONDARY_SAFE,
             0,
-            abi.encodeWithSelector(ISafe.changeThreshold.selector, module),
+            abi.encodeWithSelector(ISafe.enableModule.selector, module),
             Enum.Operation.Call
         );
     }
