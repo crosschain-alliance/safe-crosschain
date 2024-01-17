@@ -117,7 +117,7 @@ our [official website](#).
 
 ## ⚠️ Security and Development Disclaimer
 
-All contracts in this repository are still under active development. Although Safe Junction endeavors to ensure the
+All contracts in this repository are still under active development. Although Safe Cross Chain endeavors to ensure the
 highest level of security and reliability, the evolving nature of software development means that these contracts may
 contain unforeseen issues or vulnerabilities.
 
