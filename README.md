@@ -7,7 +7,7 @@
 ## Overview
 
 Safe Crosschain is a mechanism crafted to empower users with the ability to control a Safe across different blockchains
-using Hashi. The idea is to have a main Safe which can be controlled by peripheral Safes using storage proofs
+using Hashi. The idea is to have a main Safe that controls secondary Safes deployed abroad using storage proofs
 verification against a block header propagated using Hashi.
 
 &nbsp;
