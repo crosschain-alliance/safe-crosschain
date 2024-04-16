@@ -5,7 +5,7 @@ pragma solidity ^0.8.23;
 import { RLPReader } from "solidity-rlp/contracts/RLPReader.sol";
 import { MerklePatriciaProofVerifier } from "./libraries/MerklePatriciaProofVerifier.sol";
 import { Enum } from "safe-contracts/contracts/common/Enum.sol";
-import { IGiriGiriBashi } from "./interfaces/hashi/IGiriGiriBashi.sol";
+import { IShoyuBashi } from "./interfaces/hashi/IShoyuBashi.sol";
 import { ISafe } from "./interfaces/safe/ISafe.sol";
 
 contract ControllerModule {
@@ -18,7 +18,7 @@ contract ControllerModule {
     address public immutable MAIN_SAFE;
     address public immutable SECONDARY_SAFE;
     address public immutable PERIPHERAL;
-    address public immutable GIRI_GIRI_BASHI;
+    address public immutable SHOYU_BASHI;
 
     struct Proof {
         uint256 blockNumber;
@@ -57,13 +57,13 @@ contract ControllerModule {
         address mainSafe,
         address secondarySafe,
         address peripheral,
-        address giriGiriBashi
+        address shoyuBashi
     ) {
         SOURCE_CHAIN_ID = sourceChainId;
         MAIN_SAFE = mainSafe;
         SECONDARY_SAFE = secondarySafe;
         PERIPHERAL = peripheral;
-        GIRI_GIRI_BASHI = giriGiriBashi;
+        SHOYU_BASHI = shoyuBashi;
     }
 
     function changeThreshold(uint256 threshold, Proof calldata proof) external {
@@ -123,7 +123,7 @@ contract ControllerModule {
     }
 
     function _verifyProof(Proof calldata proof, bytes memory data) internal {
-        bytes32 expectedBlockHeaderHash = IGiriGiriBashi(GIRI_GIRI_BASHI).getThresholdHash(
+        bytes32 expectedBlockHeaderHash = IShoyuBashi(SHOYU_BASHI).getThresholdHash(
             SOURCE_CHAIN_ID,
             proof.blockNumber
         );

@@ -23,7 +23,7 @@ task("ControllerModule:deploy", "deploy ControllerModule")
   .addParam("mainSafe", "main Safe address", undefined, types.string)
   .addParam("secondarySafe", "Secondary Safe address in the source chain", undefined, types.string)
   .addParam("peripheral", "address of peripheral on the source chain", undefined, types.string)
-  .addParam("giriGiriBashi", "address of GiriGiriBashi", undefined, types.string)
+  .addParam("shoyuBashi", "address of ShoyuBashi", undefined, types.string)
   .addFlag("verify", "whether to verify the contract on Etherscan")
   .setAction(async (_taskArgs, hre) => {
     const ControllerModule = await hre.ethers.getContractFactory("ControllerModule")
@@ -32,7 +32,7 @@ task("ControllerModule:deploy", "deploy ControllerModule")
       _taskArgs.mainSafe,
       _taskArgs.secondarySafe,
       _taskArgs.peripheral,
-      _taskArgs.giriGiriBashi,
+      _taskArgs.shoyuBashi,
     ] as const
     const controllerModule = await ControllerModule.deploy(...constructorArguments)
     console.log("ControllerModule deployed at: ", controllerModule.address)
