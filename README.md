@@ -80,10 +80,10 @@ npm run test
 ## How to send an axiom query
 
 ```bash
-npx axiom circuit compile circuits/circuit.ts circuits/data/input.json --provider
-npx axiom circuit prove circuits/data/compiled.json circuits/data/input.json --provider
-npx axiom circuit query-params <callback-address> --sourceChainId <source-chain-id> --refundAddress <refund-address> -pv circuits/data/proven.json  --provider
-npx hardhat AxiomControllerModule:deploy --axiom-v2-query <axiom-v2-query-address> --source-chain-id <source-chain-id> --query-schema <query-schema> --provider
+npx axiom circuit compile circuits/circuit.ts circuits/data/input.json --provider <rpc-provider>
+npx axiom circuit prove circuits/data/compiled.json circuits/data/input.json --provider <rpc-provider>
+npx axiom circuit query-params <callback-address> --sourceChainId <source-chain-id> --refundAddress <refund-address> -pv circuits/data/proven.json  --provider <rpc-provider>
+npx hardhat AxiomControllerModule:deploy --axiom-v2-query <axiom-v2-query-address> --source-chain-id <source-chain-id> --query-schema <query-schema> --provider <rpc-provider>
 npx hardhat AxiomV2Query:sendQuery --axiom-v2-query <axiom-v2-query-address> --network
 ```
 
