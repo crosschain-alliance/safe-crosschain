@@ -5,16 +5,16 @@ import Safe from "@safe-global/protocol-kit"
 import { verify } from "./verify"
 import { getProof } from "./utils"
 
-import './axiom'
+import "./axiom"
 
 import { ProofStructOutput, SafeTxParamsStruct } from "../types/Controller"
 
 task("Peripheral:deploy", "deploy Peripheral")
-  .addParam("targetNetwork", "target chain id", undefined, types.int)
+  .addParam("targetChainId", "target chain id", undefined, types.int)
   .addFlag("verify", "whether to verify the contract on Etherscan")
   .setAction(async (_taskArgs, hre) => {
     const Peripheral = await hre.ethers.getContractFactory("Peripheral")
-    const constructorArguments = [_taskArgs.targetNetwork] as const
+    const constructorArguments = [_taskArgs.targetChainId] as const
     const peripheral = await Peripheral.deploy(...constructorArguments)
     console.log("Peripheral deployed at: ", peripheral.address)
     if (_taskArgs.verify) await verify(hre, peripheral, constructorArguments)
@@ -44,6 +44,9 @@ task("ControllerModule:deploy", "deploy ControllerModule")
 task("AxiomControllerModule:deploy", "deploy AxiomControllerModule")
   .addParam("axiomV2Query", "AxiomV2Query address", undefined, types.string)
   .addParam("sourceChainId", "source chain id", undefined, types.int)
+  .addParam("peripheral", "peripheral", undefined, types.string)
+  .addParam("mainSafe", "main safe", undefined, types.string)
+  .addParam("secondarySafe", "secondary safe", undefined, types.string)
   .addParam("querySchema", "Query schema", undefined, types.string)
   .addFlag("verify", "whether to verify the contract on Etherscan")
   .setAction(async (_taskArgs, hre) => {
@@ -51,7 +54,10 @@ task("AxiomControllerModule:deploy", "deploy AxiomControllerModule")
     const constructorArguments = [
       _taskArgs.axiomV2Query,
       _taskArgs.sourceChainId,
-      _taskArgs.querySchema
+      _taskArgs.peripheral,
+      _taskArgs.mainSafe,
+      _taskArgs.secondarySafe,
+      _taskArgs.querySchema,
     ] as const
     const axiomControllerModule = await AxiomControllerModule.deploy(...constructorArguments)
     console.log("AxiomControllerModule deployed at: ", axiomControllerModule.address)
@@ -60,9 +66,9 @@ task("AxiomControllerModule:deploy", "deploy AxiomControllerModule")
 
 task("ControllerModule:execTransaction:sendNativeToken", "Sends 1 wei")
   .addParam("controllerModule", "The controllerModule address", undefined, types.string)
-  .addParam("targetNetwork", "Destination network", undefined, types.string)
+  .addParam("targetChainId", "Destination network", undefined, types.string)
   .setAction(async (_taskArgs, hre) => {
-    const { targetNetwork, controllerModule: controllerModuleAddress } = _taskArgs
+    const { targetChainId, controllerModule: controllerModuleAddress } = _taskArgs
     const mainNetwork = await hre.network.name
 
     const safeTxGas = "0"
@@ -70,7 +76,7 @@ task("ControllerModule:execTransaction:sendNativeToken", "Sends 1 wei")
     const gasPrice = "1000000000"
 
     // Switch to target network to get the signature
-    await hre.changeNetwork(targetNetwork)
+    await hre.changeNetwork(targetChainId)
 
     const ControllerModule = await hre.ethers.getContractFactory("ControllerModule")
     const controllerModule = await ControllerModule.attach(controllerModuleAddress)
@@ -159,7 +165,7 @@ task("ControllerModule:execTransaction:sendNativeToken", "Sends 1 wei")
     })
 
     // Switch back to target network to call controller module
-    await hre.changeNetwork(targetNetwork)
+    await hre.changeNetwork(targetChainId)
     const tx = await controllerModule.execTransaction(
       [
         safeOwner.address,
