@@ -11,7 +11,6 @@ import "./tasks"
 const dotenvConfigPath: string = process.env.DOTENV_CONFIG_PATH || "./.env"
 dotenvConfig({ path: resolve(__dirname, dotenvConfigPath) })
 
-// Ensure that we have all the environment variables we need.
 const privateKey: string | undefined = process.env.PRIVATE_KEY
 if (!privateKey) {
   throw new Error("Please set your PRIVATE_KEY in a .env file")
@@ -26,6 +25,8 @@ const chainIds = {
   arbitrum: 42161,
   avalanche: 43114,
   "avalanche-fuji": 43113,
+  base: 8453,
+  baseSepolia: 84532,
   bsc: 56,
   "bsc-testnet": 97,
   gnosis: 100,
@@ -59,6 +60,9 @@ function getChainConfig(chain: keyof typeof chainIds): NetworkUserConfig {
       case "chiado":
         jsonRpcUrl = "https://rpc.chiadochain.net/"
         break
+      case "baseSepolia":
+        jsonRpcUrl = "https://sepolia.base.org"
+        break
       default:
         jsonRpcUrl = `https://${chain}.infura.io/v3/${infuraApiKey}`
     }
@@ -77,6 +81,8 @@ const config: HardhatUserConfig = {
     apiKey: {
       arbitrumOne: process.env.ARBISCAN_API_KEY || "",
       avalanche: process.env.SNOWTRACE_API_KEY || "",
+      base: process.env.BASESCAN_API_KEY || "",
+      baseSepolia: process.env.BASESCAN_API_KEY || "",
       bsc: process.env.BSCSCAN_API_KEY || "",
       bscTestnet: process.env.BSCSCAN_API_KEY || "",
       chiado: process.env.CHIADO_BLOCKSCOUT_API_KEY || "",
@@ -95,6 +101,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: "https://gnosis-chiado.blockscout.com/api",
           browserURL: "https://gnosis-chiado.blockscout.com/",
+        },
+      },
+      {
+        network: "baseSepolia",
+        chainId: 84532,
+        urls: {
+          apiURL: "https://api-sepolia.basescan.org/api",
+          browserURL: "https://sepolia.basescan.org",
         },
       },
     ],
@@ -129,6 +143,14 @@ const config: HardhatUserConfig = {
     avalancheFuji: {
       ...getChainConfig("avalanche-fuji"),
       gasPrice: 10e9,
+    },
+    base: {
+      ...getChainConfig("base"),
+      gasPrice: 3e9,
+    },
+    baseSepolia: {
+      ...getChainConfig("baseSepolia"),
+      gasPrice: 0.0012e9,
     },
     bsc: {
       ...getChainConfig("bsc"),
@@ -171,7 +193,6 @@ const config: HardhatUserConfig = {
     cache: "./cache",
     sources: "./contracts",
     tests: "./test",
-    // tests: "./test_axiom",
   },
   solidity: {
     version: "0.8.23",
