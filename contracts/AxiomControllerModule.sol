@@ -3,8 +3,8 @@
 pragma solidity ^0.8.23;
 
 import { Enum } from "safe-contracts/contracts/common/Enum.sol";
-import { ISafe } from "./interfaces/safe/ISafe.sol";
 import { AxiomV2Client } from "@axiom-crypto/v2-periphery/src/client/AxiomV2Client.sol";
+import { ISafe } from "./interfaces/safe/ISafe.sol";
 
 contract AxiomControllerModule is AxiomV2Client {
     uint64 public immutable SOURCE_CHAIN_ID;
