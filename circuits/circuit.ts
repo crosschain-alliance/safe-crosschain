@@ -1,32 +1,24 @@
-import {
-  addToCallback,
-  CircuitValue,
-  CircuitValue256,
-  getStorage,
-} from "@axiom-crypto/client"
+import { addToCallback, CircuitValue, CircuitValue256, getSolidityMapping } from "@axiom-crypto/client"
 
 // all fields of `CircuitInputs` must be `CircuitValue`, `CircuitValue256`,
 // or static arrays over these types
 export interface CircuitInputs {
   blockNumber: CircuitValue
-  address: CircuitValue
+  peripheral: CircuitValue
+  mainSafe: CircuitValue
   slot: CircuitValue256
 }
 
 export const defaultInputs = {
-  blockNumber: 5620977,
-  address: "0x2796816304CE26dC515312266Df21b10Bb0cDcc3",
+  blockNumber: 10606042,
+  peripheral: "0x910A6D9Fc94500a017A59F7BEED1Ddf6f96227cE",
+  mainSafe: "0x83aC9D0A29455b160Db66e14bA12295a7F2dfcF1",
   slot: 0,
 }
 
 export const circuit = async (inputs: CircuitInputs) => {
-  const storage = getStorage(inputs.blockNumber, inputs.address)
-  const value = await storage.slot(inputs.slot)
-
-  // expose relevant inputs to the smart contract
-  // addToCallback(inputs.blockNumber)
-  addToCallback(inputs.address)
-  addToCallback(inputs.slot)
-
-  addToCallback(value)
+  const mapping = getSolidityMapping(inputs.blockNumber, inputs.peripheral, inputs.slot)
+  const val = await mapping.key(inputs.mainSafe)
+  addToCallback(inputs.peripheral)
+  addToCallback(val)
 }
