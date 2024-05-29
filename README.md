@@ -82,9 +82,9 @@ npm run test
 ```bash
 npx axiom circuit compile circuits/circuit.ts circuits/data/input.json --provider <rpc-provider>
 npx axiom circuit prove circuits/data/compiled.json circuits/data/input.json --provider <rpc-provider>
-npx axiom circuit query-params <callback-address> --sourceChainId <source-chain-id> --refundAddress <refund-address> -pv circuits/data/proven.json  --provider <rpc-provider>
-npx hardhat AxiomControllerModule:deploy --axiom-v2-query <axiom-v2-query-address> --source-chain-id <source-chain-id> --query-schema <query-schema> --provider <rpc-provider>
-npx hardhat AxiomV2Query:sendQuery --axiom-v2-query <axiom-v2-query-address> --network
+npx hardhat AxiomControllerModule:deploy --axiom-v2-query <axiom-v2-query-address> --source-chain-id <source-chain-id> --query-schema <query-schema> --peripheral <pheriperal> --main-safe <main-safe> --secondary-safe <secondary-safe> --network <network>
+npx axiom circuit query-params <callback-address> --sourceChainId <source-chain-id> --refundAddress <refund-address> -pv circuits/data/proven.json --callbackExtraData <extra-data> --outputs --outputs ./circuits/data/sendQuery.json --provider <rpc-provider>
+npx hardhat AxiomV2Query:sendQuery --axiom-v2-query <axiom-v2-query-address> --network <network>
 ```
 
 &nbsp;
