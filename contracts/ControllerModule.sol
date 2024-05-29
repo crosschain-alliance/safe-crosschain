@@ -41,7 +41,7 @@ contract ControllerModule {
         bytes signatures;
     }
 
-    uint256 public expectedNonce;
+    uint256 private _expectedNonce;
 
     error InvalidLatestPeripheralCommitment(
         bytes32 latestPeripheralCommitment,
@@ -67,59 +67,34 @@ contract ControllerModule {
     }
 
     function changeThreshold(uint256 threshold, Proof calldata proof) external {
-        _verifyProof(proof, abi.encode(threshold));
-        ISafe(SECONDARY_SAFE).execTransactionFromModule(
-            SECONDARY_SAFE,
-            0,
-            abi.encodeWithSelector(ISafe.changeThreshold.selector, threshold),
-            Enum.Operation.Call
-        );
+        bytes memory data = abi.encodeWithSelector(ISafe.changeThreshold.selector, threshold);
+        _verifyProof(proof, data);
+        ISafe(SECONDARY_SAFE).execTransactionFromModule(SECONDARY_SAFE, 0, data, Enum.Operation.Call);
     }
 
     function enableModule(address module, Proof calldata proof) external {
-        _verifyProof(proof, abi.encode(module));
-        ISafe(SECONDARY_SAFE).execTransactionFromModule(
-            SECONDARY_SAFE,
-            0,
-            abi.encodeWithSelector(ISafe.enableModule.selector, module),
-            Enum.Operation.Call
-        );
+        bytes memory data = abi.encodeWithSelector(ISafe.enableModule.selector, module);
+        _verifyProof(proof, data);
+        ISafe(SECONDARY_SAFE).execTransactionFromModule(SECONDARY_SAFE, 0, data, Enum.Operation.Call);
     }
 
     function execTransaction(SafeTxParams calldata safeTxParams, Proof calldata proof) external {
-        _verifyProof(
-            proof,
-            abi.encode(
-                safeTxParams.to,
-                safeTxParams.value,
-                safeTxParams.data,
-                safeTxParams.operation,
-                safeTxParams.safeTxGas,
-                safeTxParams.baseGas,
-                safeTxParams.gasPrice,
-                safeTxParams.gasToken,
-                safeTxParams.refundReceiver,
-                safeTxParams.signatures
-            )
+        bytes memory data = abi.encodeWithSelector(
+            ISafe.execTransaction.selector,
+            safeTxParams.to,
+            safeTxParams.value,
+            safeTxParams.data,
+            safeTxParams.operation,
+            safeTxParams.safeTxGas,
+            safeTxParams.baseGas,
+            safeTxParams.gasPrice,
+            safeTxParams.gasToken,
+            safeTxParams.refundReceiver,
+            safeTxParams.signatures
         );
-        ISafe(SECONDARY_SAFE).execTransactionFromModule(
-            SECONDARY_SAFE,
-            0,
-            abi.encodeWithSelector(
-                ISafe.execTransaction.selector,
-                safeTxParams.to,
-                safeTxParams.value,
-                safeTxParams.data,
-                safeTxParams.operation,
-                safeTxParams.safeTxGas,
-                safeTxParams.baseGas,
-                safeTxParams.gasPrice,
-                safeTxParams.gasToken,
-                safeTxParams.refundReceiver,
-                safeTxParams.signatures
-            ),
-            Enum.Operation.Call
-        );
+
+        _verifyProof(proof, data);
+        ISafe(SECONDARY_SAFE).execTransactionFromModule(SECONDARY_SAFE, 0, data, Enum.Operation.Call);
     }
 
     function _verifyProof(Proof calldata proof, bytes memory data) internal {
@@ -135,7 +110,7 @@ contract ControllerModule {
             _verifyAccountProofAndGetStorageRoot(proof.blockHeader, proof.peripheralAccountProof),
             proof.peripheralStorageProof
         );
-        bytes32 latestPeripheralCommitment = keccak256(abi.encode(block.chainid, data, proof.nonce));
+        bytes32 latestPeripheralCommitment = keccak256(abi.encode(block.chainid, MAIN_SAFE, data, proof.nonce));
         if (expectedLatestPeripheralCommitment != latestPeripheralCommitment) {
             revert InvalidLatestPeripheralCommitment(latestPeripheralCommitment, expectedLatestPeripheralCommitment);
         }
@@ -175,9 +150,9 @@ contract ControllerModule {
     }
 
     function _checkNonceAndIncrementExpectedNonce(uint256 nonce) internal {
-        if (nonce != expectedNonce) revert InvalidNonce(nonce, expectedNonce);
+        if (nonce != _expectedNonce) revert InvalidNonce(nonce, _expectedNonce);
         unchecked {
-            ++expectedNonce;
+            ++_expectedNonce;
         }
     }
 
