@@ -21,8 +21,8 @@ verification against a block header propagated using Hashi.
 1. Begin by deploying two Safes - the main Safe and the Secondary Safe. Attach a module called `ControllerModule` to the
    Secondary Safe.
 
-2. Users wishing to execute a cross-chain transaction should call `execTransaction` on the `Peripheral` Safe through the MainSafe which just
-   writes in storage a commitment corresponding to the used function parameters.
+2. Users wishing to execute a cross-chain transaction should call `execTransaction` on the `Peripheral` Safe through the
+   MainSafe which just writes in storage a commitment corresponding to the used function parameters.
 
 3. After the transaction is included in a block, a relayer propagates the corresponding block header to the chain where
    the Secondary Safe is deployed.

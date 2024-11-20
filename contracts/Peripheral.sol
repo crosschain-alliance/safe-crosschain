@@ -3,27 +3,29 @@
 pragma solidity ^0.8.23;
 
 import { Enum } from "safe-contracts/contracts/common/Enum.sol";
+import { IPeripheral } from "./interfaces/IPeripheral.sol";
 
-contract Peripheral {
+contract Peripheral is IPeripheral {
     uint256 public immutable TARGET_CHAIN;
 
     mapping(address => bytes32) public latestCommitments;
-    uint256 public nonce;
-
-    event Operation(uint256 nonce, address safe, bytes data);
+    uint256 public currentNonce;
 
     constructor(uint256 targetChain) {
         TARGET_CHAIN = targetChain;
     }
 
+    /// @inheritdoc IPeripheral
     function changeThreshold(uint256 threshold) external {
         _generateCommitment(abi.encode(threshold));
     }
 
+    /// @inheritdoc IPeripheral
     function enableModule(address module) external {
         _generateCommitment(abi.encode(module));
     }
 
+    /// @inheritdoc IPeripheral
     function execTransaction(
         address to,
         uint256 value,
@@ -42,12 +44,12 @@ contract Peripheral {
     }
 
     function _generateCommitment(bytes memory data) internal {
-        uint256 currentNonce = nonce;
-        bytes32 commitment = keccak256(abi.encode(TARGET_CHAIN, data, currentNonce));
+        uint256 nonce = currentNonce;
+        bytes32 commitment = keccak256(abi.encode(TARGET_CHAIN, data, nonce));
         latestCommitments[msg.sender] = commitment;
         unchecked {
-            ++nonce;
+            ++currentNonce;
         }
-        emit Operation(currentNonce, msg.sender, data);
+        emit Operation(nonce, msg.sender, data);
     }
 }
