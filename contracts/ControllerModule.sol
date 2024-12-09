@@ -30,9 +30,7 @@ contract ControllerModule is IControllerModule, HashiProver {
         MAIN_SAFE = mainSafe;
         SECONDARY_SAFE = secondarySafe;
         PERIPHERAL = peripheral;
-        PERIPHERAL_COMMITMENTS_STORAGE_KEY = keccak256(
-            abi.encode(keccak256(abi.encode(MAIN_SAFE, LATEST_COMMITMENTS_SLOT)))
-        );
+        PERIPHERAL_COMMITMENTS_STORAGE_KEY = keccak256(abi.encode(MAIN_SAFE, LATEST_COMMITMENTS_SLOT));
     }
 
     /// @inheritdoc IControllerModule
