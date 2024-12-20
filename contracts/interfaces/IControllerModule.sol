@@ -2,7 +2,7 @@
 pragma solidity ^0.8.23;
 
 import { Enum } from "safe-contracts/contracts/common/Enum.sol";
-import { AccountAndStorageProof } from "../hashi/HashiProverStructs.sol";
+import { AccountAndStorageProof, ReceiptProof } from "../hashi/HashiProverStructs.sol";
 
 interface IControllerModule {
     struct SafeTxParams {
@@ -25,10 +25,21 @@ interface IControllerModule {
     error InvalidChainId(uint256 chainId, uint256 expectedChainId);
     error InvalidAccount(address account, address expectedAccount);
     error InvalidStorageKey(bytes32 storageKey, bytes32 expectedStorageKey);
+    error InvalidEventSignature(bytes32 expectedEventSignature, bytes32 actualEventSignature);
 
-    function changeThreshold(uint256 threshold, AccountAndStorageProof calldata proof) external;
-
-    function enableModule(address module, AccountAndStorageProof calldata proof) external;
+    function setPeripheral(address peripheral) external;
 
     function execTransaction(SafeTxParams calldata safeTxParams, AccountAndStorageProof calldata proof) external;
+
+    function removeOwnerOperation(
+        ReceiptProof calldata ownerProof,
+        AccountAndStorageProof calldata thresholdProof
+    ) external;
+
+    function addOwnerOperation(
+        AccountAndStorageProof calldata ownerProof,
+        AccountAndStorageProof calldata thresholdProof
+    ) external;
+
+    function swapOwnerOperation(AccountAndStorageProof calldata ownerProof, address previousOwner) external;
 }
